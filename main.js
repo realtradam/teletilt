@@ -30,14 +30,7 @@ function animate() {
 }
 renderer.setAnimationLoop(animate);
 
-if ( location.protocol != "https:" ) {
-location.href = "https:" + window.location.href.substring( window.location.protocol.length );
-}
-function permission () {
-    if ( typeof( DeviceMotionEvent ) !== "undefined" && typeof( DeviceMotionEvent.requestPermission ) === "function" ) {
-        // (optional) Do something before API request prompt.
-        DeviceMotionEvent.requestPermission()
-            .then( response => {
+const motionEvent = (response) => {
             // (optional) Do something after API prompt dismissed.
             if ( response == "granted" ) {
 				window.addEventListener("deviceorientation", (e) => {
@@ -76,8 +69,22 @@ function permission () {
 					document.getElementById("info").textContent=`x: ${Math.round(cube.position.x * 10)}, y: ${Math.round(cube.position.y * 10)}`;
 				});
             }
-        })
+}
+
+if ( location.protocol != "https:" ) {
+location.href = "https:" + window.location.href.substring( window.location.protocol.length );
+}
+function permission () {
+    if ( typeof( DeviceMotionEvent ) !== "undefined") {
+        // (optional) Do something before API request prompt.
+		if(typeof( DeviceMotionEvent.requestPermission ) === "function") {
+        DeviceMotionEvent.requestPermission()
+            .then(motionEvent)
             .catch( console.error )
+		}
+		else {
+			motionEvent("granted");
+		}
     } else {
         alert( "DeviceMotionEvent is not defined" );
     }
